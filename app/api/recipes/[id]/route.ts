@@ -20,3 +20,16 @@ export async function GET(
 
   return Response.json(recipe);
 }
+
+export async function DELETE(
+  _request: Request,
+  ctx: RouteContext<'/api/recipes/[id]'>
+) {
+  const { id } = await ctx.params;
+  try {
+    await prisma.recipe.delete({ where: { id } });
+    return new Response(null, { status: 204 });
+  } catch {
+    return Response.json({ error: 'Recette introuvable' }, { status: 404 });
+  }
+}
