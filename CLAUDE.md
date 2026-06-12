@@ -12,12 +12,15 @@ L'utilisateur est le **architecte senior** : il dirige, valide chaque jalon,
 et apprend en cours de route. Claude Code agit comme **développeur junior** :
 il explique ses choix simplement, sans jargon inutile.
 
-## Stack imposé
-- **Next.js 15** (App Router) + **TypeScript** strict
-- **Prisma** + **SQLite** (fichier `prisma/dev.db`)
-- **Tailwind CSS** pour le style
+## Stack réelle (versions installées)
+- **Next.js 16.2.9** (App Router, Turbopack en dev) + **TypeScript** strict
+- **Prisma 7 / @prisma/client 7** + **SQLite** (fichier `dev.db` à la racine)
+  - Client généré dans `app/generated/prisma/` (import : `@/app/generated/prisma`)
+  - Config dans `prisma.config.ts` (Prisma 7 n'utilise plus `datasource.url` dans `schema.prisma`)
+- **Tailwind CSS v4** pour le style
 - Pas de librairie UI lourde ; composants simples et lisibles
-- Environnement : WSL Ubuntu, port 3000
+- Environnement : Windows 11 + WSL Ubuntu pour scripts Python, port 3000
+  (si le port 3000 est occupé, Next.js passe automatiquement au port 3001)
 
 ## Règles de développement
 1. **Avancer jalon par jalon** selon ROADMAP.md. Ne jamais commencer un jalon
@@ -37,7 +40,7 @@ il explique ses choix simplement, sans jargon inutile.
 Interface unique pour que le modèle d'IA soit interchangeable :
 
 ```ts
-// src/lib/providers/types.ts
+// lib/providers/types.ts
 export interface LLMProvider {
   name: string;
   extractRecipe(transcript: string, sourceUrl: string): Promise<RecipeJSON>;
@@ -45,13 +48,13 @@ export interface LLMProvider {
 ```
 
 Implémentations prévues :
-- `gemini.ts` — Google Gemini Flash via API REST (palier gratuit). Par défaut.
-- `ollama.ts` — Ollama local (`http://localhost:11434`, modèle `qwen2.5:7b`,
+- `lib/providers/gemini.ts` — Google Gemini Flash via API REST (palier gratuit). Par défaut.
+- `lib/providers/ollama.ts` — Ollama local (`http://localhost:11434`, modèle `qwen2.5:7b`,
   `format: "json"`). Optionnel.
 
 Le provider actif est choisi par la variable d'environnement `LLM_PROVIDER`
 (`gemini` | `ollama`). Le prompt d'extraction est dans **PROMPTS.md** et doit
-être chargé depuis un fichier (`src/lib/prompts/extract-recipe.txt`), pas
+être chargé depuis un fichier (`lib/prompts/extract-recipe.txt`), pas
 codé en dur.
 
 ## Pipeline d'extraction du texte
@@ -115,9 +118,10 @@ model Tag {
 
 ## Commandes utiles
 ```bash
-npm run dev                  # serveur de développement (port 3000)
+npm run dev                  # serveur de développement (port 3000 ou 3001)
 npx prisma migrate dev       # appliquer le schéma à la BD
 npx prisma studio            # explorer la BD dans le navigateur
+npx tsc --noEmit             # vérifier les types TypeScript sans compiler
 ~/.venv-recettes/bin/python scripts/transcribe.py <url>   # test transcription
 ```
 
