@@ -16,9 +16,10 @@ model Recipe {
   servings    Int?
   prepMinutes Int?
   cookMinutes Int?
-  status      String   @default("PENDING")
-  transcript  String?
-  notes       String?
+  status       String   @default("PENDING")
+  errorMessage String?
+  transcript   String?
+  notes        String?
   createdAt   DateTime @default(now())
   ingredients Ingredient[]
   steps       Step[]

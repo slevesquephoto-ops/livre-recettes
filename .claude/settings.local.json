@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Steeve\\\\Claude Code Projects\\\\video-recettes\\\\lib\\\\providers\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Steeve\\\\Claude Code Projects\\\\video-recettes\\\\lib\\\\prompts\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Steeve\\\\Claude Code Projects\\\\video-recettes\\\\app\\\\api\\\\debug\\\\recipe\")"
+    ]
+  }
+}
