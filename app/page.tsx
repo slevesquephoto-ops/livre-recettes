@@ -42,7 +42,7 @@ export default async function Home({
         <div className="flex-1">
           <SearchBar defaultValue={search} />
         </div>
-        <p className="text-stone-400 text-sm shrink-0">
+        <p className="text-stone-400 dark:text-stone-500 text-sm shrink-0">
           {recipes.length} recette{recipes.length !== 1 ? 's' : ''}
           {(search || activeTag) ? ' trouvée' + (recipes.length !== 1 ? 's' : '') : ''}
         </p>
@@ -56,7 +56,7 @@ export default async function Home({
             className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
               !activeTag
                 ? 'bg-orange-600 text-white border-orange-600'
-                : 'bg-white text-stone-600 border-stone-300 hover:border-orange-400 hover:text-orange-600'
+                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-orange-400 hover:text-orange-600 dark:hover:border-orange-600 dark:hover:text-orange-400'
             }`}
           >
             Toutes
@@ -71,7 +71,7 @@ export default async function Home({
                 className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
                   isActive
                     ? 'bg-orange-600 text-white border-orange-600'
-                    : 'bg-white text-stone-600 border-stone-300 hover:border-orange-400 hover:text-orange-600'
+                    : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-orange-400 hover:text-orange-600 dark:hover:border-orange-600 dark:hover:text-orange-400'
                 }`}
               >
                 {t.name}
@@ -86,7 +86,7 @@ export default async function Home({
       {recipes.length === 0 && (
         <div className="text-center py-24 text-stone-400">
           <p className="text-5xl mb-4">{search || activeTag ? '🔍' : '🍽️'}</p>
-          <p className="text-lg font-medium text-stone-600">
+          <p className="text-lg font-medium text-stone-600 dark:text-stone-400">
             {search || activeTag ? 'Aucune recette ne correspond.' : 'Aucune recette pour l\'instant'}
           </p>
           {search || activeTag ? (

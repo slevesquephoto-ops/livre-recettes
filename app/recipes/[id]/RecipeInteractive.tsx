@@ -81,21 +81,21 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
       {/* Breadcrumb */}
-      <Link href="/" className="text-stone-400 hover:text-orange-600 text-sm transition-colors">
+      <Link href="/" className="text-stone-400 dark:text-stone-500 hover:text-orange-600 dark:hover:text-orange-400 text-sm transition-colors">
         ← Toutes les recettes
       </Link>
 
       {/* Miniature */}
       {recipe.imageUrl && (
-        <div className="relative aspect-video rounded-2xl overflow-hidden mt-4 bg-stone-100">
+        <div className="relative aspect-video rounded-2xl overflow-hidden mt-4 bg-stone-100 dark:bg-stone-800">
           <Image src={recipe.imageUrl} alt={recipe.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
         </div>
       )}
 
       {/* Titre + plateforme */}
       <div className="mt-6 flex items-start justify-between gap-4">
-        <h1 className="text-3xl font-bold text-stone-900 leading-tight">{recipe.title}</h1>
-        <span className="shrink-0 bg-stone-100 text-stone-500 text-xs px-2 py-1 rounded-full border border-stone-200 mt-1 capitalize">
+        <h1 className="text-3xl font-bold text-stone-900 dark:text-stone-100 leading-tight">{recipe.title}</h1>
+        <span className="shrink-0 bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 text-xs px-2 py-1 rounded-full border border-stone-200 dark:border-stone-700 mt-1 capitalize">
           {recipe.platform}
         </span>
       </div>
@@ -104,7 +104,7 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
       {recipe.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {recipe.tags.map(tag => (
-            <span key={tag.id} className="bg-orange-50 text-orange-700 text-xs px-3 py-1 rounded-full border border-orange-100">
+            <span key={tag.id} className="bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-xs px-3 py-1 rounded-full border border-orange-100 dark:border-orange-900">
               {tag.name}
             </span>
           ))}
@@ -112,19 +112,19 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
       )}
 
       {/* Contrôle des portions + méta */}
-      <div className="mt-6 bg-stone-50 rounded-2xl border border-stone-200 p-4 flex flex-wrap gap-6 items-center">
+      <div className="mt-6 bg-stone-50 dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 flex flex-wrap gap-6 items-center">
         {/* Portions */}
         <div className="flex flex-col items-center gap-1">
-          <p className="text-xs text-stone-400 uppercase tracking-wide">Portions</p>
+          <p className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wide">Portions</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setServings(s => Math.max(1, s - 1))}
-              className="w-7 h-7 rounded-full bg-white border border-stone-300 text-stone-600 font-bold text-lg flex items-center justify-center hover:border-orange-400 hover:text-orange-600 transition-colors"
+              className="w-7 h-7 rounded-full bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 font-bold text-lg flex items-center justify-center hover:border-orange-400 hover:text-orange-600 dark:hover:border-orange-500 dark:hover:text-orange-400 transition-colors"
             >−</button>
-            <span className="text-xl font-bold text-stone-900 min-w-[2ch] text-center">{servings}</span>
+            <span className="text-xl font-bold text-stone-900 dark:text-stone-100 min-w-[2ch] text-center">{servings}</span>
             <button
               onClick={() => setServings(s => s + 1)}
-              className="w-7 h-7 rounded-full bg-white border border-stone-300 text-stone-600 font-bold text-lg flex items-center justify-center hover:border-orange-400 hover:text-orange-600 transition-colors"
+              className="w-7 h-7 rounded-full bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 font-bold text-lg flex items-center justify-center hover:border-orange-400 hover:text-orange-600 dark:hover:border-orange-500 dark:hover:text-orange-400 transition-colors"
             >+</button>
           </div>
           {scale !== 1 && (
@@ -136,26 +136,26 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
 
         {recipe.prepMinutes && (
           <div className="text-center">
-            <p className="text-xs text-stone-400 uppercase tracking-wide">Préparation</p>
-            <p className="font-semibold text-stone-800">{formatTime(recipe.prepMinutes)}</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wide">Préparation</p>
+            <p className="font-semibold text-stone-800 dark:text-stone-200">{formatTime(recipe.prepMinutes)}</p>
           </div>
         )}
         {recipe.cookMinutes && (
           <div className="text-center">
-            <p className="text-xs text-stone-400 uppercase tracking-wide">Cuisson</p>
-            <p className="font-semibold text-stone-800">{formatTime(recipe.cookMinutes)}</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wide">Cuisson</p>
+            <p className="font-semibold text-stone-800 dark:text-stone-200">{formatTime(recipe.cookMinutes)}</p>
           </div>
         )}
       </div>
 
-      <hr className="my-8 border-stone-200" />
+      <hr className="my-8 border-stone-200 dark:border-stone-800" />
 
       {/* Ingrédients */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-stone-900">Ingrédients</h2>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">Ingrédients</h2>
           {checkedIngredients.size > 0 && (
-            <button onClick={() => setCheckedIngredients(new Set())} className="text-xs text-stone-400 hover:text-stone-600">
+            <button onClick={() => setCheckedIngredients(new Set())} className="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
               Tout décocher
             </button>
           )}
@@ -173,9 +173,9 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
                     onChange={() => toggleIngredient(ing.id)}
                     className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
                   />
-                  <span className={`text-stone-700 leading-snug transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
+                  <span className={`text-stone-700 dark:text-stone-300 leading-snug transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
                     {qty && (
-                      <span className="font-semibold text-stone-900">
+                      <span className="font-semibold text-stone-900 dark:text-stone-100">
                         {qty}{ing.unit ? ` ${ing.unit}` : ''}{' '}
                       </span>
                     )}
@@ -188,14 +188,14 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
         </ul>
       </section>
 
-      <hr className="my-8 border-stone-200" />
+      <hr className="my-8 border-stone-200 dark:border-stone-800" />
 
       {/* Étapes */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-stone-900">Préparation</h2>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">Préparation</h2>
           {checkedSteps.size > 0 && (
-            <button onClick={() => setCheckedSteps(new Set())} className="text-xs text-stone-400 hover:text-stone-600">
+            <button onClick={() => setCheckedSteps(new Set())} className="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
               Tout décocher
             </button>
           )}
@@ -218,7 +218,7 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
                       onChange={() => toggleStep(step.id)}
                       className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
                     />
-                    <p className={`text-stone-700 leading-relaxed transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
+                    <p className={`text-stone-700 dark:text-stone-300 leading-relaxed transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
                       {step.text}
                     </p>
                   </div>
@@ -229,13 +229,13 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
         </ol>
       </section>
 
-      <hr className="my-8 border-stone-200" />
+      <hr className="my-8 border-stone-200 dark:border-stone-800" />
 
       {/* Notes personnelles */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold text-stone-900">📝 Mes notes</h2>
-          <span className={`text-xs transition-opacity duration-300 ${noteStatus === 'idle' ? 'opacity-0' : 'opacity-100'} ${noteStatus === 'saved' ? 'text-green-600' : 'text-stone-400'}`}>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">📝 Mes notes</h2>
+          <span className={`text-xs transition-opacity duration-300 ${noteStatus === 'idle' ? 'opacity-0' : 'opacity-100'} ${noteStatus === 'saved' ? 'text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
             {noteStatus === 'saving' ? 'Sauvegarde…' : '✓ Sauvegardé'}
           </span>
         </div>
@@ -244,11 +244,11 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
           onChange={e => handleNotesChange(e.target.value)}
           placeholder="Mes variantes, astuces, prochaines fois…"
           rows={4}
-          className="w-full bg-white text-stone-900 placeholder-stone-400 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+          className="w-full bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 border border-stone-300 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
         />
       </section>
 
-      <hr className="my-8 border-stone-200" />
+      <hr className="my-8 border-stone-200 dark:border-stone-800" />
 
       {/* Mode cuisson */}
       {recipe.steps.length > 0 && (
@@ -268,7 +268,7 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
           href={recipe.sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+          className="text-sm font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors"
         >
           ▶ Voir la vidéo originale →
         </a>
@@ -277,20 +277,20 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
             href={`/recipes/${recipe.id}/print`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors"
+            className="text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             🖨️ Imprimer
           </Link>
           <Link
             href={`/recipes/${recipe.id}/edit`}
-            className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors"
+            className="text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             ✏️ Modifier
           </Link>
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="text-sm text-red-500 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
+            className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium disabled:opacity-50 transition-colors"
           >
             {deleting ? 'Suppression…' : 'Supprimer la recette'}
           </button>

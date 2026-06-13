@@ -63,12 +63,12 @@ export default function AddPage() {
 
   return (
     <main className="max-w-lg mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-stone-900 mb-2">Importer une recette</h1>
-      <p className="text-stone-500 text-sm mb-8">Collez le lien d&apos;une vidéo YouTube, TikTok ou Facebook.</p>
+      <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 mb-2">Importer une recette</h1>
+      <p className="text-stone-500 dark:text-stone-400 text-sm mb-8">Collez le lien d&apos;une vidéo YouTube, TikTok ou Facebook.</p>
 
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm p-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <label htmlFor="url" className="text-sm font-medium text-stone-700">
+          <label htmlFor="url" className="text-sm font-medium text-stone-700 dark:text-stone-300">
             URL de la vidéo
           </label>
           <input
@@ -79,7 +79,7 @@ export default function AddPage() {
             placeholder="YouTube, TikTok ou Facebook..."
             required
             disabled={isProcessing || stage === 'done'}
-            className="w-full bg-white text-stone-900 placeholder-stone-400 border border-stone-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-stone-50 disabled:text-stone-400"
+            className="w-full bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 border border-stone-300 dark:border-stone-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-stone-50 dark:disabled:bg-stone-900 disabled:text-stone-400"
           />
           <button
             type="submit"
@@ -92,7 +92,7 @@ export default function AddPage() {
 
         {/* Traitement */}
         {isProcessing && (
-          <div className="mt-6 flex flex-col items-center gap-3 text-stone-500">
+          <div className="mt-6 flex flex-col items-center gap-3 text-stone-500 dark:text-stone-400">
             <svg className="animate-spin h-6 w-6 text-orange-500" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
@@ -107,13 +107,13 @@ export default function AddPage() {
 
         {/* Succès */}
         {stage === 'done' && (
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+          <div className="mt-6 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-900 rounded-xl p-5 text-center">
             <p className="text-2xl mb-2">✅</p>
-            <p className="font-semibold text-green-800">{recipeTitle}</p>
-            <p className="text-green-600 text-sm mt-1">Recette importée avec succès !</p>
+            <p className="font-semibold text-green-800 dark:text-green-300">{recipeTitle}</p>
+            <p className="text-green-600 dark:text-green-400 text-sm mt-1">Recette importée avec succès !</p>
             <button
               onClick={() => { setStage('idle'); setUrl(''); setRecipeId(null); setDbStatus('PENDING'); }}
-              className="mt-4 text-sm text-orange-600 hover:text-orange-700 font-medium"
+              className="mt-4 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 font-medium"
             >
               Importer une autre recette →
             </button>
@@ -122,12 +122,12 @@ export default function AddPage() {
 
         {/* Erreur */}
         {stage === 'error' && (
-          <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-5">
-            <p className="font-semibold text-red-800 text-sm">Erreur lors de l&apos;importation</p>
-            <p className="text-red-600 text-sm mt-1">{errorMsg}</p>
+          <div className="mt-6 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 rounded-xl p-5">
+            <p className="font-semibold text-red-800 dark:text-red-300 text-sm">Erreur lors de l&apos;importation</p>
+            <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errorMsg}</p>
             <button
               onClick={() => { setStage('idle'); setErrorMsg(''); }}
-              className="mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
+              className="mt-3 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 font-medium"
             >
               Réessayer →
             </button>

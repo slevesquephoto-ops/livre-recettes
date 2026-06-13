@@ -54,7 +54,7 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
                 className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
                   isSelected
                     ? 'bg-orange-600 border-orange-600 text-white'
-                    : 'bg-white/80 border-stone-300 opacity-0 group-hover:opacity-100'
+                    : 'bg-white/80 dark:bg-stone-900/80 border-stone-300 dark:border-stone-600 opacity-0 group-hover:opacity-100'
                 }`}
               >
                 {isSelected && (
@@ -66,12 +66,14 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
 
               <Link
                 href={`/recipes/${recipe.id}`}
-                className={`block bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition-all ${
-                  isSelected ? 'border-orange-400 ring-2 ring-orange-200' : 'border-stone-200 hover:border-orange-200'
+                className={`block bg-white dark:bg-stone-900 rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition-all ${
+                  isSelected
+                    ? 'border-orange-400 dark:border-orange-500 ring-2 ring-orange-200 dark:ring-orange-900'
+                    : 'border-stone-200 dark:border-stone-800 hover:border-orange-200 dark:hover:border-orange-800'
                 }`}
               >
                 {/* Miniature */}
-                <div className="relative aspect-video bg-stone-100">
+                <div className="relative aspect-video bg-stone-100 dark:bg-stone-800">
                   {recipe.imageUrl ? (
                     <Image
                       src={recipe.imageUrl}
@@ -90,10 +92,10 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
 
                 {/* Infos */}
                 <div className="p-4">
-                  <h2 className={`font-semibold leading-snug line-clamp-2 transition-colors ${isSelected ? 'text-orange-700' : 'text-stone-900 group-hover:text-orange-600'}`}>
+                  <h2 className={`font-semibold leading-snug line-clamp-2 transition-colors ${isSelected ? 'text-orange-700 dark:text-orange-400' : 'text-stone-900 dark:text-stone-100 group-hover:text-orange-600 dark:group-hover:text-orange-400'}`}>
                     {recipe.title}
                   </h2>
-                  <div className="flex items-center gap-3 mt-2 text-stone-400 text-xs">
+                  <div className="flex items-center gap-3 mt-2 text-stone-400 dark:text-stone-500 text-xs">
                     {timeLabel(recipe.prepMinutes, recipe.cookMinutes) && (
                       <span>⏱ {timeLabel(recipe.prepMinutes, recipe.cookMinutes)}</span>
                     )}
@@ -102,7 +104,7 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
                   {recipe.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">
                       {recipe.tags.slice(0, 3).map(t => (
-                        <span key={t.id} className="bg-orange-50 text-orange-700 text-xs px-2 py-0.5 rounded-full border border-orange-100">
+                        <span key={t.id} className="bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-xs px-2 py-0.5 rounded-full border border-orange-100 dark:border-orange-900">
                           {t.name}
                         </span>
                       ))}
@@ -117,7 +119,7 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
 
       {/* Barre flottante de sélection */}
       {selected.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-stone-900 text-white rounded-2xl shadow-2xl px-5 py-3 border border-stone-700">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-stone-900 dark:bg-stone-800 text-white rounded-2xl shadow-2xl px-5 py-3 border border-stone-700 dark:border-stone-600">
           <span className="text-sm">
             <span className="font-bold text-orange-400">{selected.size}</span> recette{selected.size > 1 ? 's' : ''} sélectionnée{selected.size > 1 ? 's' : ''}
           </span>

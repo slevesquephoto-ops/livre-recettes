@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Active le dark mode basé sur la classe .dark sur <html> (géré par next-themes) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
