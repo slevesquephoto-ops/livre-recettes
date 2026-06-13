@@ -2,6 +2,7 @@ import { prisma } from './prisma';
 import { detectPlatform } from './platform';
 import { extractYoutube } from './youtube';
 import { runTranscribeScript } from './transcribe';
+import { extractThumbnail } from './thumbnail';
 import { geminiProvider } from './providers/gemini';
 
 /** Relance uniquement l'extraction LLM sur le transcript déjà conservé. */
@@ -81,7 +82,12 @@ export async function runPipeline(recipeId: string, url: string): Promise<void> 
       const cookiesPath = platform === 'facebook'
         ? (process.env.FB_COOKIES_PATH || undefined)
         : undefined;
-      transcript = await runTranscribeScript(url, cookiesPath);
+      const [t, thumb] = await Promise.all([
+        runTranscribeScript(url, cookiesPath),
+        extractThumbnail(url, platform, cookiesPath),
+      ]);
+      transcript = t;
+      imageUrl = thumb ?? undefined;
     }
 
     const recipe = await geminiProvider.extractRecipe(transcript, url);
