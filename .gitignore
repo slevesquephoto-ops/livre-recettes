@@ -46,3 +46,8 @@ next-env.d.ts
 # base de données SQLite locale
 /dev.db
 /dev.db-journal
+
+# fichiers de cookies navigateur (Facebook, etc.)
+*_cookies.txt
+*.cookies.txt
+cookies.txt
