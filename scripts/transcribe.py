@@ -5,7 +5,10 @@ le transcrit avec faster-whisper, et imprime le texte brut sur stdout.
 
 Usage :
   python transcribe.py <url>
-  python transcribe.py <url> --cookies /chemin/vers/cookies.txt   # Facebook
+  python transcribe.py <url> --cookies /chemin/vers/cookies.txt   # Facebook explicite
+
+  Pour Facebook sans passer --cookies, définir FB_COOKIES_PATH dans .env
+  (l'app Next.js le fait automatiquement).
 
 Codes de sortie :
   0  succès  (texte sur stdout)
@@ -36,10 +39,27 @@ def _find_ffmpeg() -> str | None:
         return None
 
 
+def _resolve_cookies(cookies_arg: str | None, url: str) -> str | None:
+    """
+    Priorité : argument CLI > variable FB_COOKIES_PATH (si URL Facebook).
+    Vérifie que le fichier existe avant de le retourner.
+    """
+    path = cookies_arg or (
+        os.environ.get("FB_COOKIES_PATH")
+        if "facebook.com" in url or "fb.watch" in url
+        else None
+    )
+    if path and not os.path.isfile(path):
+        print(f"Avertissement : fichier de cookies introuvable : {path}", file=sys.stderr)
+        return None
+    return path
+
+
 def transcribe(url: str, cookies_path: str | None = None) -> str:
     whisper_model = os.environ.get("WHISPER_MODEL", "small")
     ytdlp_bin = os.environ.get("YTDLP_BIN", _default_ytdlp())
     ffmpeg_path = _find_ffmpeg()
+    cookies = _resolve_cookies(cookies_path, url)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         audio_path = os.path.join(tmpdir, "audio.%(ext)s")
@@ -56,8 +76,8 @@ def transcribe(url: str, cookies_path: str | None = None) -> str:
         ]
         if ffmpeg_path:
             cmd += ["--ffmpeg-location", ffmpeg_path]
-        if cookies_path:
-            cmd += ["--cookies", cookies_path]
+        if cookies:
+            cmd += ["--cookies", cookies]
         cmd.append(url)
 
         result = subprocess.run(cmd, capture_output=True, text=True)
@@ -87,8 +107,12 @@ def transcribe(url: str, cookies_path: str | None = None) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Transcrit une vidéo en texte.")
-    parser.add_argument("url", help="URL de la vidéo")
-    parser.add_argument("--cookies", help="Fichier de cookies (ex : Facebook)", default=None)
+    parser.add_argument("url", help="URL de la vidéo (YouTube, TikTok, Facebook)")
+    parser.add_argument(
+        "--cookies",
+        help="Fichier cookies Netscape (optionnel ; pour Facebook, FB_COOKIES_PATH dans .env suffit)",
+        default=None,
+    )
     args = parser.parse_args()
 
     text = transcribe(args.url, args.cookies)
