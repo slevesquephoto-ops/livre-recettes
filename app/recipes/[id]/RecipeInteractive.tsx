@@ -250,6 +250,18 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
 
       <hr className="my-8 border-stone-200" />
 
+      {/* Mode cuisson */}
+      {recipe.steps.length > 0 && (
+        <div className="mb-8">
+          <Link
+            href={`/recipes/${recipe.id}/cook`}
+            className="flex items-center justify-center gap-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-2xl py-4 text-base transition-colors"
+          >
+            👨‍🍳 Mode cuisson
+          </Link>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <a
