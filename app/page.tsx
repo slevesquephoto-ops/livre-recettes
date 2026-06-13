@@ -1,13 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import Image from 'next/image';
 import { SearchBar } from '@/app/components/SearchBar';
-
-function timeLabel(prep: number | null, cook: number | null): string | null {
-  const total = (prep ?? 0) + (cook ?? 0);
-  if (total === 0) return null;
-  return total < 60 ? `${total} min` : `${Math.floor(total / 60)}h${total % 60 > 0 ? (total % 60) : ''}`;
-}
+import { RecipeGrid } from '@/app/components/RecipeGrid';
 
 export default async function Home({
   searchParams,
@@ -108,57 +102,7 @@ export default async function Home({
       )}
 
       {/* Grille */}
-      {recipes.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map(recipe => (
-            <Link
-              key={recipe.id}
-              href={`/recipes/${recipe.id}`}
-              className="group block bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden hover:shadow-md hover:border-orange-200 transition-all"
-            >
-              {/* Miniature */}
-              <div className="relative aspect-video bg-stone-100">
-                {recipe.imageUrl ? (
-                  <Image
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-4xl">🍴</div>
-                )}
-                <span className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full capitalize">
-                  {recipe.platform}
-                </span>
-              </div>
-
-              {/* Infos */}
-              <div className="p-4">
-                <h2 className="font-semibold text-stone-900 leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors">
-                  {recipe.title}
-                </h2>
-                <div className="flex items-center gap-3 mt-2 text-stone-400 text-xs">
-                  {timeLabel(recipe.prepMinutes, recipe.cookMinutes) && (
-                    <span>⏱ {timeLabel(recipe.prepMinutes, recipe.cookMinutes)}</span>
-                  )}
-                  {recipe.servings && <span>👤 {recipe.servings} pers.</span>}
-                </div>
-                {recipe.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {recipe.tags.slice(0, 3).map(t => (
-                      <span key={t.id} className="bg-orange-50 text-orange-700 text-xs px-2 py-0.5 rounded-full border border-orange-100">
-                        {t.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      {recipes.length > 0 && <RecipeGrid recipes={recipes} />}
     </main>
   );
 }
