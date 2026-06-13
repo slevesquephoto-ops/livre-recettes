@@ -19,9 +19,27 @@ import subprocess
 import argparse
 
 
+def _default_ytdlp() -> str:
+    """Trouve yt-dlp dans le même dossier que l'interpréteur Python actuel."""
+    scripts_dir = os.path.dirname(sys.executable)
+    name = "yt-dlp.exe" if os.name == "nt" else "yt-dlp"
+    candidate = os.path.join(scripts_dir, name)
+    return candidate if os.path.isfile(candidate) else "yt-dlp"
+
+
+def _find_ffmpeg() -> str | None:
+    """Cherche ffmpeg : d'abord imageio-ffmpeg (bundlé dans le venv), puis PATH."""
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except ImportError:
+        return None
+
+
 def transcribe(url: str, cookies_path: str | None = None) -> str:
     whisper_model = os.environ.get("WHISPER_MODEL", "small")
-    ytdlp_bin = os.environ.get("YTDLP_BIN", "yt-dlp")
+    ytdlp_bin = os.environ.get("YTDLP_BIN", _default_ytdlp())
+    ffmpeg_path = _find_ffmpeg()
 
     with tempfile.TemporaryDirectory() as tmpdir:
         audio_path = os.path.join(tmpdir, "audio.%(ext)s")
@@ -36,6 +54,8 @@ def transcribe(url: str, cookies_path: str | None = None) -> str:
             "--no-playlist",
             "--quiet",
         ]
+        if ffmpeg_path:
+            cmd += ["--ffmpeg-location", ffmpeg_path]
         if cookies_path:
             cmd += ["--cookies", cookies_path]
         cmd.append(url)
@@ -56,12 +76,10 @@ def transcribe(url: str, cookies_path: str | None = None) -> str:
         # Transcription avec faster-whisper
         from faster_whisper import WhisperModel
 
-        # device="auto" utilise CUDA si disponible, sinon CPU
-        model = WhisperModel(
-            whisper_model,
-            device="auto",
-            compute_type="auto",
-        )
+        # CPU par défaut ; mettre WHISPER_DEVICE=cuda dans .env si CUDA disponible
+        device = os.environ.get("WHISPER_DEVICE", "cpu")
+        compute_type = "int8" if device == "cpu" else "float16"
+        model = WhisperModel(whisper_model, device=device, compute_type=compute_type)
         segments, _ = model.transcribe(audio_file, beam_size=5, language=None)
 
         return " ".join(seg.text.strip() for seg in segments)
