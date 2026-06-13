@@ -1,5 +1,7 @@
 import { prisma } from './prisma';
+import { detectPlatform } from './platform';
 import { extractYoutube } from './youtube';
+import { runTranscribeScript } from './transcribe';
 import { geminiProvider } from './providers/gemini';
 
 /** Exécute le pipeline complet pour une recette déjà créée en BD (status PENDING). */
@@ -10,20 +12,38 @@ export async function runPipeline(recipeId: string, url: string): Promise<void> 
   });
 
   try {
-    const youtube = await extractYoutube(url);
-    const recipe = await geminiProvider.extractRecipe(youtube.transcript, url);
+    const platform = detectPlatform(url);
+    let transcript: string;
+    let imageUrl: string | undefined;
+    let title = 'Sans titre';
+
+    if (platform === 'youtube') {
+      // YouTube : transcript via API + métadonnées (titre, miniature)
+      const yt = await extractYoutube(url);
+      transcript = yt.transcript;
+      imageUrl = yt.imageUrl;
+      title = yt.title;
+    } else {
+      // TikTok / Facebook : audio via yt-dlp + transcription locale Whisper
+      const cookiesPath = platform === 'facebook'
+        ? (process.env.FB_COOKIES_PATH || undefined)
+        : undefined;
+      transcript = await runTranscribeScript(url, cookiesPath);
+    }
+
+    const recipe = await geminiProvider.extractRecipe(transcript, url);
 
     // Sauvegarde complète en une transaction
     await prisma.recipe.update({
       where: { id: recipeId },
       data: {
         status: 'READY',
-        title: recipe.title,
-        imageUrl: youtube.imageUrl,
+        title: recipe.title || title,
+        imageUrl: imageUrl ?? null,
         servings: recipe.servings,
         prepMinutes: recipe.prepMinutes,
         cookMinutes: recipe.cookMinutes,
-        transcript: youtube.transcript,
+        transcript,
         ingredients: {
           create: recipe.ingredients.map((ing, i) => ({
             quantity: ing.quantity,

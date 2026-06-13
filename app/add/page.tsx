@@ -64,7 +64,7 @@ export default function AddPage() {
   return (
     <main className="max-w-lg mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold text-stone-900 mb-2">Importer une recette</h1>
-      <p className="text-stone-500 text-sm mb-8">Collez le lien d&apos;une vidéo YouTube de recette.</p>
+      <p className="text-stone-500 text-sm mb-8">Collez le lien d&apos;une vidéo YouTube, TikTok ou Facebook.</p>
 
       <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -76,7 +76,7 @@ export default function AddPage() {
             type="url"
             value={url}
             onChange={e => setUrl(e.target.value)}
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder="YouTube, TikTok ou Facebook..."
             required
             disabled={isProcessing || stage === 'done'}
             className="w-full bg-white text-stone-900 placeholder-stone-400 border border-stone-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-stone-50 disabled:text-stone-400"
