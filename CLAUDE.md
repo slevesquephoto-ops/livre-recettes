@@ -62,11 +62,14 @@ codé en dur.
   auto-générés, priorité `fr` puis `en`) sans télécharger la vidéo.
   Récupérer aussi : titre, miniature, chaîne, durée.
 - **TikTok / Facebook (Phase 2)** : le script `scripts/transcribe.py`
-  télécharge l'audio avec yt-dlp (binaire : `~/.venv-recettes/bin/yt-dlp`),
-  le transcrit avec faster-whisper (modèle `small`, langue auto), et imprime
-  le texte sur stdout. L'API Next.js l'appelle via `child_process`.
-  Pour Facebook : option `--cookies` avec le fichier pointé par
-  `FB_COOKIES_PATH` dans `.env`.
+  télécharge l'audio avec yt-dlp, le transcrit avec faster-whisper
+  (modèle `small`, langue auto), et imprime le texte sur stdout.
+  L'API Next.js l'appelle via `child_process` (spawn).
+  Pour Facebook : option `--cookies` avec le fichier pointé par `FB_COOKIES_PATH`.
+  **Environnement Windows** : venv à `C:\Users\Steeve\.venv-recettes\`
+  - Python  : `...\Scripts\python.exe`
+  - yt-dlp  : `...\Scripts\yt-dlp.exe`
+  - faster-whisper 1.2.1 + ctranslate2 4.8.0, device=auto (CPU/CUDA)
 - Le traitement peut prendre 30 s à 2 min : l'interface doit afficher un
   état « Traitement en cours… » (statut en BD : `PENDING | PROCESSING |
   READY | ERROR`).
