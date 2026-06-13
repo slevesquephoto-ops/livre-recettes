@@ -262,6 +262,14 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
         </a>
         <div className="flex items-center gap-4">
           <Link
+            href={`/recipes/${recipe.id}/print`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors"
+          >
+            🖨️ Imprimer
+          </Link>
+          <Link
             href={`/recipes/${recipe.id}/edit`}
             className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors"
           >
