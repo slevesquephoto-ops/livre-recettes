@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+
 import type { Prisma } from '@/app/generated/prisma/client';
 
 type Recipe = Prisma.RecipeGetPayload<{
@@ -250,7 +251,7 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
       <hr className="my-8 border-stone-200" />
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <a
           href={recipe.sourceUrl}
           target="_blank"
@@ -259,13 +260,21 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
         >
           ▶ Voir la vidéo originale →
         </a>
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="text-sm text-red-500 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
-        >
-          {deleting ? 'Suppression…' : 'Supprimer la recette'}
-        </button>
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/recipes/${recipe.id}/edit`}
+            className="text-sm font-medium text-stone-500 hover:text-stone-800 transition-colors"
+          >
+            ✏️ Modifier
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="text-sm text-red-500 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
+          >
+            {deleting ? 'Suppression…' : 'Supprimer la recette'}
+          </button>
+        </div>
       </div>
     </main>
   );
