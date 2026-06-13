@@ -18,6 +18,26 @@ function scaleQty(qty: number | null, scale: number): string {
   return parseFloat(scaled.toFixed(2)).toString();
 }
 
+/**
+ * Regroupe une liste d'items par section, en préservant l'ordre d'apparition.
+ * Items avec section=null sont regroupés dans un bloc unique sans titre.
+ */
+function groupBySection<T extends { section: string | null }>(items: T[]): { section: string | null; items: T[] }[] {
+  const groups: { section: string | null; items: T[] }[] = [];
+  const indexByKey = new Map<string, number>();
+  for (const item of items) {
+    const key = item.section ?? '__none__';
+    let idx = indexByKey.get(key);
+    if (idx === undefined) {
+      idx = groups.length;
+      indexByKey.set(key, idx);
+      groups.push({ section: item.section, items: [] });
+    }
+    groups[idx].items.push(item);
+  }
+  return groups;
+}
+
 function formatTime(minutes: number | null): string | null {
   if (!minutes) return null;
   if (minutes < 60) return `${minutes} min`;
@@ -100,6 +120,13 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
         </span>
       </div>
 
+      {/* Description */}
+      {recipe.description && (
+        <p className="mt-3 text-stone-600 dark:text-stone-400 italic leading-relaxed">
+          {recipe.description}
+        </p>
+      )}
+
       {/* Tags */}
       {recipe.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -160,32 +187,43 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
             </button>
           )}
         </div>
-        <ul className="space-y-2">
-          {recipe.ingredients.map(ing => {
-            const checked = checkedIngredients.has(ing.id);
-            const qty = scaleQty(ing.quantity, scale);
-            return (
-              <li key={ing.id}>
-                <label className="flex items-baseline gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleIngredient(ing.id)}
-                    className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
-                  />
-                  <span className={`text-stone-700 dark:text-stone-300 leading-snug transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
-                    {qty && (
-                      <span className="font-semibold text-stone-900 dark:text-stone-100">
-                        {qty}{ing.unit ? ` ${ing.unit}` : ''}{' '}
-                      </span>
-                    )}
-                    {ing.name}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="space-y-5">
+          {groupBySection(recipe.ingredients).map((group, gi) => (
+            <div key={gi}>
+              {group.section && (
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-400 mb-2">
+                  {group.section}
+                </h3>
+              )}
+              <ul className="space-y-2">
+                {group.items.map(ing => {
+                  const checked = checkedIngredients.has(ing.id);
+                  const qty = scaleQty(ing.quantity, scale);
+                  return (
+                    <li key={ing.id}>
+                      <label className="flex items-baseline gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleIngredient(ing.id)}
+                          className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
+                        />
+                        <span className={`text-stone-700 dark:text-stone-300 leading-snug transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
+                          {qty && (
+                            <span className="font-semibold text-stone-900 dark:text-stone-100">
+                              {qty}{ing.unit ? ` ${ing.unit}` : ''}{' '}
+                            </span>
+                          )}
+                          {ing.name}
+                        </span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
       </section>
 
       <hr className="my-8 border-stone-200 dark:border-stone-800" />
@@ -200,33 +238,44 @@ export function RecipeInteractive({ recipe }: { recipe: Recipe }) {
             </button>
           )}
         </div>
-        <ol className="space-y-3">
-          {recipe.steps.map((step, i) => {
-            const checked = checkedSteps.has(step.id);
-            return (
-              <li key={step.id}>
-                <label className="flex gap-4 cursor-pointer">
-                  <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                    checked ? 'bg-green-500 text-white' : 'bg-orange-600 text-white'
-                  }`}>
-                    {checked ? '✓' : i + 1}
-                  </span>
-                  <div className="flex items-start gap-2 flex-1 pt-0.5">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleStep(step.id)}
-                      className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
-                    />
-                    <p className={`text-stone-700 dark:text-stone-300 leading-relaxed transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
-                      {step.text}
-                    </p>
-                  </div>
-                </label>
-              </li>
-            );
-          })}
-        </ol>
+        <div className="space-y-6">
+          {groupBySection(recipe.steps).map((group, gi) => (
+            <div key={gi}>
+              {group.section && (
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-400 mb-3">
+                  {group.section}
+                </h3>
+              )}
+              <ol className="space-y-3">
+                {group.items.map((step, i) => {
+                  const checked = checkedSteps.has(step.id);
+                  return (
+                    <li key={step.id}>
+                      <label className="flex gap-4 cursor-pointer">
+                        <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                          checked ? 'bg-green-500 text-white' : 'bg-orange-600 text-white'
+                        }`}>
+                          {checked ? '✓' : i + 1}
+                        </span>
+                        <div className="flex items-start gap-2 flex-1 pt-0.5">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleStep(step.id)}
+                            className="mt-1 shrink-0 accent-orange-600 w-4 h-4"
+                          />
+                          <p className={`text-stone-700 dark:text-stone-300 leading-relaxed transition-opacity ${checked ? 'line-through opacity-40' : ''}`}>
+                            {step.text}
+                          </p>
+                        </div>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ))}
+        </div>
       </section>
 
       <hr className="my-8 border-stone-200 dark:border-stone-800" />

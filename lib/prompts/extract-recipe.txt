@@ -9,24 +9,36 @@ valide, sans aucun texte avant ou après, sans balises Markdown.
 Format exact attendu :
 {
   "title": "Nom de la recette en français",
+  "description": "Brève description en 1-2 phrases (style, origine, idée du plat).",
   "servings": 4,
   "prepMinutes": 15,
   "cookMinutes": 30,
   "ingredients": [
-    { "quantity": 250, "unit": "ml", "name": "lait" },
-    { "quantity": 2, "unit": null, "name": "œufs" },
-    { "quantity": null, "unit": null, "name": "sel, au goût" }
+    { "section": "Boulettes", "quantity": 500, "unit": "g", "name": "bœuf haché" },
+    { "section": "Boulettes", "quantity": 1, "unit": null, "name": "œuf" },
+    { "section": "Sauce",     "quantity": 250, "unit": "ml", "name": "crème 35 %" },
+    { "section": "Sauce",     "quantity": null, "unit": null, "name": "sel, au goût" }
   ],
   "steps": [
-    "Préchauffer le four à 180 °C (350 °F).",
-    "Mélanger les ingrédients secs dans un grand bol."
+    { "section": "Boulettes", "text": "Mélanger le bœuf, l'œuf et les épices." },
+    { "section": "Boulettes", "text": "Former des boulettes de 3 cm." },
+    { "section": "Sauce",     "text": "Chauffer la crème dans une casserole." }
   ],
-  "suggestedTags": ["dessert", "rapide"]
+  "suggestedTags": ["plat principal", "comfort food"]
 }
 
 Règles :
 - Réponds en français, même si la vidéo est en anglais (convertis les
   unités impériales en ajoutant l'équivalent métrique quand pertinent).
+- "description" : 1 à 2 phrases courtes qui décrivent la recette (ce que c'est,
+  son style, son origine si évidente). null si la transcription ne donne
+  pas d'indication suffisante. Ne devine jamais.
+- "section" : nom de la sous-recette (ex. "Sauce", "Pâte", "Garniture",
+  "Plat principal"). Utilise une section SEULEMENT si la recette comporte
+  vraiment plusieurs composantes distinctes. Si la recette est monobloc
+  (un seul plat sans sous-recette), mets "section": null PARTOUT.
+  Les ingrédients et étapes d'une même section doivent porter le même
+  nom de section, écrit identiquement (sensible à la casse).
 - "quantity" est un nombre (1.5 pour « une tasse et demie ») ou null si
   non précisé. "unit" est null pour les items comptables (œufs, oignons).
 - Unités acceptées : g, kg, ml, l, c. à thé, c. à soupe, tasse, pincée.

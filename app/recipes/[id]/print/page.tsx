@@ -15,6 +15,22 @@ function formatQty(qty: number | null): string {
   return Number.isInteger(qty) ? String(qty) : parseFloat(qty.toFixed(2)).toString();
 }
 
+function groupBySection<T extends { section: string | null }>(items: T[]): { section: string | null; items: T[] }[] {
+  const groups: { section: string | null; items: T[] }[] = [];
+  const indexByKey = new Map<string, number>();
+  for (const item of items) {
+    const key = item.section ?? '__none__';
+    let idx = indexByKey.get(key);
+    if (idx === undefined) {
+      idx = groups.length;
+      indexByKey.set(key, idx);
+      groups.push({ section: item.section, items: [] });
+    }
+    groups[idx].items.push(item);
+  }
+  return groups;
+}
+
 export default async function PrintPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const recipe = await prisma.recipe.findUnique({
@@ -38,6 +54,12 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
         {/* En-tête */}
         <header className="mb-6 pb-4 border-b border-stone-300">
           <h1 className="text-3xl font-bold leading-tight mb-2">{recipe.title}</h1>
+
+          {recipe.description && (
+            <p className="text-stone-600 italic text-sm mb-3 leading-relaxed">
+              {recipe.description}
+            </p>
+          )}
 
           {/* Tags */}
           {recipe.tags.length > 0 && (
@@ -72,36 +94,58 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
           {/* Ingrédients */}
           <section className="mb-8 print:mb-0">
             <h2 className="text-lg font-bold mb-3 uppercase tracking-wide text-stone-700 text-sm">Ingrédients</h2>
-            <ul className="space-y-1.5">
-              {recipe.ingredients.map(ing => (
-                <li key={ing.id} className="flex items-baseline gap-2 text-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0 mt-1.5" />
-                  <span>
-                    {ing.quantity != null && (
-                      <span className="font-semibold">
-                        {formatQty(ing.quantity)}{ing.unit ? ` ${ing.unit}` : ''}{' '}
-                      </span>
-                    )}
-                    {ing.name}
-                  </span>
-                </li>
+            <div className="space-y-4">
+              {groupBySection(recipe.ingredients).map((group, gi) => (
+                <div key={gi}>
+                  {group.section && (
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-orange-700 mb-1.5">
+                      {group.section}
+                    </h3>
+                  )}
+                  <ul className="space-y-1.5">
+                    {group.items.map(ing => (
+                      <li key={ing.id} className="flex items-baseline gap-2 text-sm">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0 mt-1.5" />
+                        <span>
+                          {ing.quantity != null && (
+                            <span className="font-semibold">
+                              {formatQty(ing.quantity)}{ing.unit ? ` ${ing.unit}` : ''}{' '}
+                            </span>
+                          )}
+                          {ing.name}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
 
-          {/* Étapes */}
+          {/* Étapes — numérotation redémarre par section */}
           <section className="mb-8 print:mb-0">
             <h2 className="text-lg font-bold mb-3 uppercase tracking-wide text-stone-700 text-sm">Préparation</h2>
-            <ol className="space-y-3">
-              {recipe.steps.map((step, i) => (
-                <li key={step.id} className="flex gap-3 text-sm">
-                  <span className="shrink-0 w-5 h-5 mt-0.5 rounded-full bg-orange-600 text-white text-xs font-bold flex items-center justify-center print:bg-stone-700">
-                    {i + 1}
-                  </span>
-                  <p className="leading-relaxed text-stone-800">{step.text}</p>
-                </li>
+            <div className="space-y-5">
+              {groupBySection(recipe.steps).map((group, gi) => (
+                <div key={gi}>
+                  {group.section && (
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-orange-700 mb-2">
+                      {group.section}
+                    </h3>
+                  )}
+                  <ol className="space-y-3">
+                    {group.items.map((step, i) => (
+                      <li key={step.id} className="flex gap-3 text-sm">
+                        <span className="shrink-0 w-5 h-5 mt-0.5 rounded-full bg-orange-600 text-white text-xs font-bold flex items-center justify-center print:bg-stone-700">
+                          {i + 1}
+                        </span>
+                        <p className="leading-relaxed text-stone-800">{step.text}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               ))}
-            </ol>
+            </div>
           </section>
         </div>
 

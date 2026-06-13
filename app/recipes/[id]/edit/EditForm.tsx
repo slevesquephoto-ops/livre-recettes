@@ -9,20 +9,21 @@ type Recipe = Prisma.RecipeGetPayload<{
   include: { ingredients: { orderBy: { order: 'asc' } }; steps: { orderBy: { order: 'asc' } } };
 }>;
 
-type IngRow = { id?: string; quantity: string; unit: string; name: string };
-type StepRow = { id?: string; text: string };
+type IngRow = { id?: string; section: string; quantity: string; unit: string; name: string };
+type StepRow = { id?: string; section: string; text: string };
 
 export function EditForm({ recipe }: { recipe: Recipe }) {
   const router = useRouter();
   const [title, setTitle] = useState(recipe.title);
+  const [description, setDescription] = useState(recipe.description ?? '');
   const [servings, setServings] = useState(String(recipe.servings ?? ''));
   const [prepMinutes, setPrepMinutes] = useState(String(recipe.prepMinutes ?? ''));
   const [cookMinutes, setCookMinutes] = useState(String(recipe.cookMinutes ?? ''));
   const [ingredients, setIngredients] = useState<IngRow[]>(
-    recipe.ingredients.map(i => ({ id: i.id, quantity: i.quantity != null ? String(i.quantity) : '', unit: i.unit ?? '', name: i.name }))
+    recipe.ingredients.map(i => ({ id: i.id, section: i.section ?? '', quantity: i.quantity != null ? String(i.quantity) : '', unit: i.unit ?? '', name: i.name }))
   );
   const [steps, setSteps] = useState<StepRow[]>(
-    recipe.steps.map(s => ({ id: s.id, text: s.text }))
+    recipe.steps.map(s => ({ id: s.id, section: s.section ?? '', text: s.text }))
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -41,19 +42,22 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
   }
 
   function addIngredient() {
-    setIngredients(prev => [...prev, { quantity: '', unit: '', name: '' }]);
+    // Pré-remplit la section avec la dernière section utilisée pour faciliter la saisie
+    const lastSection = ingredients.length > 0 ? ingredients[ingredients.length - 1].section : '';
+    setIngredients(prev => [...prev, { section: lastSection, quantity: '', unit: '', name: '' }]);
   }
 
   function removeIngredient(i: number) {
     setIngredients(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  function updateStep(i: number, value: string) {
-    setSteps(prev => prev.map((row, idx) => idx === i ? { ...row, text: value } : row));
+  function updateStep(i: number, field: keyof StepRow, value: string) {
+    setSteps(prev => prev.map((row, idx) => idx === i ? { ...row, [field]: value } : row));
   }
 
   function addStep() {
-    setSteps(prev => [...prev, { text: '' }]);
+    const lastSection = steps.length > 0 ? steps[steps.length - 1].section : '';
+    setSteps(prev => [...prev, { section: lastSection, text: '' }]);
   }
 
   function removeStep(i: number) {
@@ -80,12 +84,14 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: title.trim(),
+          description: description.trim() || null,
           servings: servings ? parseInt(servings) : null,
           prepMinutes: prepMinutes ? parseInt(prepMinutes) : null,
           cookMinutes: cookMinutes ? parseInt(cookMinutes) : null,
           ingredients: ingredients
             .filter(i => i.name.trim())
             .map((i, order) => ({
+              section: i.section.trim() || null,
               quantity: i.quantity ? parseFloat(i.quantity) : null,
               unit: i.unit.trim() || null,
               name: i.name.trim(),
@@ -93,7 +99,11 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
             })),
           steps: steps
             .filter(s => s.text.trim())
-            .map((s, order) => ({ text: s.text.trim(), order })),
+            .map((s, order) => ({
+              section: s.section.trim() || null,
+              text: s.text.trim(),
+              order,
+            })),
         }),
       });
       if (!res.ok) throw new Error('Erreur lors de la sauvegarde');
@@ -182,6 +192,16 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
               className="w-full bg-white text-stone-900 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Description (optionnel)</label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Brève description de la recette en 1-2 phrases"
+              rows={2}
+              className="w-full bg-white text-stone-900 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+            />
+          </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Portions</label>
@@ -212,10 +232,16 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
 
         {/* Ingrédients */}
         <section className="bg-white border border-stone-200 rounded-2xl p-6">
-          <h2 className="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-4">Ingrédients</h2>
+          <h2 className="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-1">Ingrédients</h2>
+          <p className="text-xs text-stone-400 mb-4">Section : laisse vide si la recette n'a qu'un seul bloc. Sinon, écris le même nom pour les ingrédients qui vont ensemble (ex. « Sauce »).</p>
           <div className="space-y-2">
             {ingredients.map((ing, i) => (
               <div key={i} className="flex gap-2 items-center">
+                <input
+                  type="text" placeholder="Section" value={ing.section}
+                  onChange={e => updateIngredient(i, 'section', e.target.value)}
+                  className="w-28 bg-stone-50 text-stone-700 border border-stone-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 italic"
+                />
                 <input
                   type="text" placeholder="Qté" value={ing.quantity}
                   onChange={e => updateIngredient(i, 'quantity', e.target.value)}
@@ -244,19 +270,27 @@ export function EditForm({ recipe }: { recipe: Recipe }) {
 
         {/* Étapes */}
         <section className="bg-white border border-stone-200 rounded-2xl p-6">
-          <h2 className="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-4">Étapes</h2>
+          <h2 className="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-1">Étapes</h2>
+          <p className="text-xs text-stone-400 mb-4">Section : laisse vide si la recette n'a qu'un seul bloc. La numérotation redémarre à 1 à chaque section.</p>
           <div className="space-y-3">
             {steps.map((step, i) => (
               <div key={i} className="flex gap-2 items-start">
                 <span className="shrink-0 w-6 h-6 mt-2 rounded-full bg-orange-600 text-white text-xs font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
-                <textarea
-                  value={step.text}
-                  onChange={e => updateStep(i, e.target.value)}
-                  rows={2}
-                  className="flex-1 bg-white text-stone-900 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-                />
+                <div className="flex-1 space-y-1.5">
+                  <input
+                    type="text" placeholder="Section" value={step.section}
+                    onChange={e => updateStep(i, 'section', e.target.value)}
+                    className="w-full bg-stone-50 text-stone-700 border border-stone-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 italic"
+                  />
+                  <textarea
+                    value={step.text}
+                    onChange={e => updateStep(i, 'text', e.target.value)}
+                    rows={2}
+                    className="w-full bg-white text-stone-900 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                  />
+                </div>
                 <div className="flex flex-col gap-0.5 mt-1.5">
                   <button type="button" onClick={() => moveStep(i, -1)} disabled={i === 0}
                     className="text-stone-300 hover:text-stone-600 disabled:opacity-20 text-xs leading-none">▲</button>

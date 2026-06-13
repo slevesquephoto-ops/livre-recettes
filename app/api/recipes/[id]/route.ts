@@ -28,17 +28,19 @@ export async function PUT(
   const { id } = await ctx.params;
   const body = await request.json() as {
     title?: string;
+    description?: string | null;
     servings?: number | null;
     prepMinutes?: number | null;
     cookMinutes?: number | null;
-    ingredients?: { quantity: number | null; unit: string | null; name: string; order: number }[];
-    steps?: { text: string; order: number }[];
+    ingredients?: { section: string | null; quantity: number | null; unit: string | null; name: string; order: number }[];
+    steps?: { section: string | null; text: string; order: number }[];
   };
 
   await prisma.recipe.update({
     where: { id },
     data: {
       title: body.title,
+      description: body.description ?? null,
       servings: body.servings,
       prepMinutes: body.prepMinutes,
       cookMinutes: body.cookMinutes,

@@ -24,11 +24,13 @@ export async function reExtractRecipe(recipeId: string): Promise<void> {
       data: {
         status: 'READY',
         title: recipe.title,
+        description: recipe.description ?? null,
         servings: recipe.servings,
         prepMinutes: recipe.prepMinutes,
         cookMinutes: recipe.cookMinutes,
         ingredients: {
           create: recipe.ingredients.map((ing, i) => ({
+            section: ing.section ?? null,
             quantity: ing.quantity,
             unit: ing.unit,
             name: ing.name,
@@ -36,7 +38,11 @@ export async function reExtractRecipe(recipeId: string): Promise<void> {
           })),
         },
         steps: {
-          create: recipe.steps.map((text, i) => ({ order: i, text })),
+          create: recipe.steps.map((s, i) => ({
+            section: s.section ?? null,
+            order: i,
+            text: s.text,
+          })),
         },
       },
     });
@@ -98,6 +104,7 @@ export async function runPipeline(recipeId: string, url: string): Promise<void> 
       data: {
         status: 'READY',
         title: recipe.title || title,
+        description: recipe.description ?? null,
         imageUrl: imageUrl ?? null,
         servings: recipe.servings,
         prepMinutes: recipe.prepMinutes,
@@ -105,6 +112,7 @@ export async function runPipeline(recipeId: string, url: string): Promise<void> 
         transcript,
         ingredients: {
           create: recipe.ingredients.map((ing, i) => ({
+            section: ing.section ?? null,
             quantity: ing.quantity,
             unit: ing.unit,
             name: ing.name,
@@ -112,7 +120,11 @@ export async function runPipeline(recipeId: string, url: string): Promise<void> 
           })),
         },
         steps: {
-          create: recipe.steps.map((text, i) => ({ order: i, text })),
+          create: recipe.steps.map((s, i) => ({
+            section: s.section ?? null,
+            order: i,
+            text: s.text,
+          })),
         },
       },
     });

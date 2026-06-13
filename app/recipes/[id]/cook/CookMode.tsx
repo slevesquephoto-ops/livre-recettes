@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-type Step = { id: string; text: string; order: number };
+type Step = { id: string; text: string; order: number; section: string | null };
 
 /** Extrait une durée en secondes depuis le texte d'une étape. */
 function parseTimerSeconds(text: string): number | null {
@@ -51,6 +51,26 @@ function playBeep() {
   } catch { /* AudioContext non dispo */ }
 }
 
+/**
+ * Calcule la position de chaque étape DANS sa section (1-based) et la taille
+ * de la section, pour afficher « Étape 2 sur 5 » par section et redémarrer
+ * la numérotation à chaque sous-recette.
+ */
+function computeSectionLayout(steps: Step[]) {
+  const sectionTotals = new Map<string, number>();
+  for (const s of steps) {
+    const key = s.section ?? '__none__';
+    sectionTotals.set(key, (sectionTotals.get(key) ?? 0) + 1);
+  }
+  const counters = new Map<string, number>();
+  return steps.map(s => {
+    const key = s.section ?? '__none__';
+    const pos = (counters.get(key) ?? 0) + 1;
+    counters.set(key, pos);
+    return { positionInSection: pos, totalInSection: sectionTotals.get(key)! };
+  });
+}
+
 export function CookMode({ recipeId, title, steps }: { recipeId: string; title: string; steps: Step[] }) {
   const [stepIdx, setStepIdx] = useState(0);
   const [initialSecs, setInitialSecs] = useState<number | null>(null);
@@ -59,6 +79,11 @@ export function CookMode({ recipeId, title, steps }: { recipeId: string; title: 
   const [timerDone, setTimerDone] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const layout = computeSectionLayout(steps);
+  const current = layout[stepIdx];
+  const prevSection = stepIdx > 0 ? steps[stepIdx - 1].section : null;
+  const showSectionHeader = steps[stepIdx].section !== null && steps[stepIdx].section !== prevSection;
 
   // Wake lock : empêche l'écran de s'éteindre
   useEffect(() => {
@@ -134,12 +159,22 @@ export function CookMode({ recipeId, title, steps }: { recipeId: string; title: 
 
       {/* Étape */}
       <main className="flex-1 flex flex-col justify-center px-6 py-8 max-w-2xl mx-auto w-full">
-        {/* Numéro de l'étape */}
+        {/* En-tête de section (visible seulement à l'entrée d'une nouvelle section) */}
+        {showSectionHeader && (
+          <p className="text-orange-400 text-xs font-semibold uppercase tracking-widest mb-3">
+            {steps[stepIdx].section}
+          </p>
+        )}
+
+        {/* Numéro de l'étape — position dans la section */}
         <div className="flex items-center gap-3 mb-6">
           <span className="w-10 h-10 rounded-full bg-orange-600 text-white font-bold text-lg flex items-center justify-center shrink-0">
-            {stepIdx + 1}
+            {current.positionInSection}
           </span>
-          <span className="text-stone-400 text-sm">Étape {stepIdx + 1} sur {steps.length}</span>
+          <span className="text-stone-400 text-sm">
+            Étape {current.positionInSection} sur {current.totalInSection}
+            {steps[stepIdx].section && ` · ${steps[stepIdx].section}`}
+          </span>
         </div>
 
         {/* Texte de l'étape */}
