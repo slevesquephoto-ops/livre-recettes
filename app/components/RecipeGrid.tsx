@@ -92,7 +92,7 @@ export function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
 
                 {/* Infos */}
                 <div className="p-4">
-                  <h2 className={`font-semibold leading-snug line-clamp-2 transition-colors ${isSelected ? 'text-orange-700 dark:text-orange-400' : 'text-stone-900 dark:text-stone-100 group-hover:text-orange-600 dark:group-hover:text-orange-400'}`}>
+                  <h2 className={`font-semibold leading-snug line-clamp-2 min-h-[2.75rem] transition-colors ${isSelected ? 'text-orange-700 dark:text-orange-400' : 'text-stone-900 dark:text-stone-100 group-hover:text-orange-600 dark:group-hover:text-orange-400'}`}>
                     {recipe.title}
                   </h2>
                   <div className="flex items-center gap-3 mt-2 text-stone-400 dark:text-stone-500 text-xs">
