@@ -21,6 +21,19 @@ export async function GET(
   return Response.json(recipe);
 }
 
+export async function PATCH(
+  request: Request,
+  ctx: RouteContext<'/api/recipes/[id]'>
+) {
+  const { id } = await ctx.params;
+  const body = await request.json() as { notes?: string };
+  const recipe = await prisma.recipe.update({
+    where: { id },
+    data: { notes: body.notes },
+  });
+  return Response.json({ notes: recipe.notes });
+}
+
 export async function DELETE(
   _request: Request,
   ctx: RouteContext<'/api/recipes/[id]'>
