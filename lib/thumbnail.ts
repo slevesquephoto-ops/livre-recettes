@@ -21,7 +21,8 @@ export async function extractThumbnail(
     const ytdlpBin = process.env.YTDLP_BIN ?? 'yt-dlp';
     const args: string[] = [];
     if (cookiesPath) args.push('--cookies', cookiesPath);
-    args.push('--print', 'thumbnail', '--skip-download', '--no-playlist', url);
+    // « -- » : tout ce qui suit est une URL, jamais une option de yt-dlp
+    args.push('--print', 'thumbnail', '--skip-download', '--no-playlist', '--', url);
 
     const proc = spawn(ytdlpBin, args);
     proc.stdout.setEncoding('utf8');

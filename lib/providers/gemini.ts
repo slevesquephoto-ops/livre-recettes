@@ -11,7 +11,7 @@ function buildPrompt(transcript: string): string {
 
 async function callGemini(prompt: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash';
+  const model = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash';
   if (!apiKey) throw new Error('GEMINI_API_KEY manquante dans .env');
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;

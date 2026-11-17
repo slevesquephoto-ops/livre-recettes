@@ -1,6 +1,29 @@
 # 📖 VidéoRecettes
 
+> ## 🚧 Projet personnel — en révision
+> **Hors service pour le moment.** Le modèle d'IA utilisé à l'origine (Gemini 2.0 Flash)
+> a été retiré par Google le 1er juin 2026. Le projet a été mis à jour vers un modèle
+> récent, mais ce correctif n'a pas encore été testé de bout en bout.
+>
+> Application conçue pour un usage personnel, sur un seul ordinateur. Elle n'a pas
+> d'authentification et n'est pas destinée à être exposée sur un réseau ou sur Internet.
+
 Ton livre de recettes personnel. Colle le lien d'une vidéo YouTube, TikTok ou Facebook — l'app extrait automatiquement les ingrédients et les étapes, et les sauvegarde dans un livre consultable, avec mode cuisson, liste d'épicerie et export PDF.
+
+---
+
+## Stack
+
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Prisma 7 + SQLite · API Gemini ·
+yt-dlp + faster-whisper (transcription locale en Python)
+
+## Développement assisté par IA
+
+Projet développé avec **Claude Code**, avancé jalon par jalon (voir `ROADMAP.md`).
+Mon rôle : définir le besoin et les jalons, valider chaque étape, tester l'application.
+Le prompt d'extraction est versionné à part dans `lib/prompts/extract-recipe.txt`
+(voir aussi `PROMPTS.md`), et le fournisseur d'IA est isolé derrière une interface
+(`lib/providers/`) pour pouvoir être remplacé.
 
 ---
 
@@ -85,7 +108,9 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-Ouvre ton navigateur à l'adresse **http://localhost:3000** — l'app est prête !
+Ouvre ton navigateur à l'adresse **http://localhost:3001** — l'app est prête !
+
+> L'app écoute seulement sur ton ordinateur (`127.0.0.1`) : elle n'est pas accessible depuis les autres appareils du réseau. C'est voulu, puisqu'elle n'a pas de mot de passe.
 
 ---
 
@@ -102,10 +127,11 @@ Ouvre le fichier `.env` et remplis les champs suivants.
 
 ```
 GEMINI_API_KEY="ta-clé-ici"
-GEMINI_MODEL="gemini-2.0-flash"
+GEMINI_MODEL="gemini-3.5-flash"
 ```
 
-> Le niveau gratuit de Gemini est largement suffisant pour un usage personnel.
+> Le niveau gratuit de Gemini suffit habituellement pour un usage personnel. Vérifie les limites du modèle choisi dans Google AI Studio.
+> Google retire régulièrement ses anciens modèles : si l'extraction cesse de fonctionner, consulte https://ai.google.dev/gemini-api/docs/deprecations et change `GEMINI_MODEL`.
 
 ### Base de données (ne rien changer)
 
@@ -189,7 +215,7 @@ cd livre-recettes
 npm run dev
 ```
 
-Puis ouvre **http://localhost:3000** dans ton navigateur.
+Puis ouvre **http://localhost:3001** dans ton navigateur.
 
 Pour arrêter l'app : appuie sur **Ctrl+C** dans le terminal.
 
@@ -204,7 +230,8 @@ Pour arrêter l'app : appuie sur **Ctrl+C** dans le terminal.
 | L'app affiche "Erreur serveur" sur une recette YouTube | Vérifie que `GEMINI_API_KEY` est bien rempli dans `.env` |
 | TikTok/Facebook ne fonctionnent pas | Vérifie les chemins `PYTHON_BIN` et `YTDLP_BIN` dans `.env` |
 | La transcription est lente | Normal sur CPU — le modèle `small` prend 1-3 min. Passe à `WHISPER_DEVICE=cuda` si tu as une GPU NVIDIA |
-| Port 3000 déjà utilisé | Next.js passe automatiquement au port 3001 — ouvre http://localhost:3001 |
+| Port 3001 déjà utilisé | Ferme l'autre programme qui l'utilise, ou change le numéro après `-p` dans `package.json` |
+| Erreur Gemini 404 « model not found » | Le modèle a été retiré par Google : change `GEMINI_MODEL` dans `.env` (voir la page des retraits de modèles) |
 
 ---
 
