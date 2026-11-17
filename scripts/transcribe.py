@@ -78,7 +78,8 @@ def transcribe(url: str, cookies_path: str | None = None) -> str:
             cmd += ["--ffmpeg-location", ffmpeg_path]
         if cookies:
             cmd += ["--cookies", cookies]
-        cmd.append(url)
+        # « -- » : tout ce qui suit est une URL, jamais une option de yt-dlp
+        cmd += ["--", url]
 
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
